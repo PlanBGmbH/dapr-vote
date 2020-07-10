@@ -1,0 +1,9 @@
+
+# Build generated files in src
+/**/obj
+/**/bin
+
+.fake
+.ionide
+.history
+.vscode
