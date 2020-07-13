@@ -1,10 +1,11 @@
 namespace Actors
 
 open Dapr.Actors.AspNetCore
+open Dapr.Actors.Runtime
+open Dapr.Client
 open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Hosting
 
-// Based on https://github.com/dapr/dotnet-sdk/blob/master/docs/get-started-dapr-actor.md#register-actor-to-dapr-runtime
 module Program =
     let exitCode = 0
     let port = 3000
@@ -15,7 +16,11 @@ module Program =
                 webBuilder
                     .UseStartup<Startup>()
                     .UseActors(fun actorRuntime ->
-                        actorRuntime.RegisterActor<VotingActor>()
+                        actorRuntime.RegisterActor<VotingActor>(fun tpe ->
+                            ActorService(tpe, fun actorService actorId ->
+                                VotingActor(actorService, actorId, DaprClientBuilder().Build()) :> Actor
+                            )
+                      )
                     )
                     .UseUrls(sprintf "http://localhost:%d/" port)
                     |> ignore

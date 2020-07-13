@@ -1,11 +1,11 @@
 namespace Actors
 
+open Dapr.Client
 open Dapr.Actors
 open Dapr.Actors.Runtime
 open Shared
 open Shared.Actors
-
-// Based on https://github.com/dapr/dotnet-sdk/blob/master/docs/get-started-dapr-actor.md#add-actor-implementation
+open Shared.Extensions
 
 /// <summary>
 /// An actor that is responsible for handling the votes in the state store.
@@ -16,48 +16,14 @@ open Shared.Actors
 /// we use an actor to handle the state manipulation. Due to it's nature an actor handles on request at the time.
 /// With this we don't need to implement locking or synchronization in our program.
 /// </summary>
-type VotingActor(actorService: ActorService, actorId: ActorId) =
+/// <param name="actorService">The <see cref="P:Dapr.Actors.Runtime.Actor.ActorService" /> that will host this actor instance.</param>
+/// <param name="actorId">Id for the actor.</param>
+/// <param name="daprClient">A dapr client instance.</param>
+[<Actor(TypeName = VotingActor.name)>]
+type VotingActor(actorService: ActorService, actorId: ActorId, daprClient: DaprClient) =
     inherit Actor(actorService, actorId)
 
-    let stateManager = base.StateManager
-
-    /// <summary>
-    /// Helper function to handle the non-existence of the votes in the data store in a functional way, by returning
-    /// the `Option` type.
-    ///
-    /// The state manager throws an exception if the key "votes" doesn't exists in the store. We catch that exception
-    /// and return `None` in this case. If we get the result, we return `Some`.
-    /// </summary>
-    /// <returns>Maybe the votes</returns>
-    let getVotes: Async<Option<Votes>> =
-        async {
-            try
-                let! votes =
-                    stateManager.GetStateAsync<Votes>("votes")
-                    |> Async.AwaitTask
-                return Some(votes)
-            with :? System.Collections.Generic.KeyNotFoundException -> return None
-        }
-
-    (*
-        The actor implementation.
-    *)
-
     interface IVotingActor with
-
-        /// <summary>
-        /// Gets the voting results
-        /// </summary>
-        /// <returns>The voting results</returns>
-        member _.Results =
-            async {
-                let! maybeVotes = getVotes
-
-                return match maybeVotes with
-                       | Some (votes) -> votes
-                       | None -> Votes.empty
-            }
-            |> Async.StartAsTask
 
         /// <summary>
         /// Increase the votes for the given `Animal`.
@@ -66,14 +32,15 @@ type VotingActor(actorService: ActorService, actorId: ActorId) =
         /// <returns>The updated votes</returns>
         member _.Vote(animal) =
             async {
-                let! maybeVotes = getVotes
+                let! maybeVotes = daprClient.GetStateAsyncF("voting", "votes")
 
                 let updatedVotes =
                     (match maybeVotes with
                      | Some (votes) -> votes
-                     | None -> Votes.empty).Vote(animal)
+                     | None -> Votes.empty)
+                        .Vote(animal)
 
-                stateManager.SetStateAsync<Votes>("votes", updatedVotes)
+                daprClient.SaveStateAsync<Votes>("voting", "votes", updatedVotes)
                 |> Async.AwaitTask
                 |> ignore
 

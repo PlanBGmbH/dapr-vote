@@ -25,13 +25,11 @@ The application consists of four services:
 ## Run the actors service
 
 ```
-cd actors
-dapr run --app-id actors --app-port 3000 dotnet run
+dapr run --app-id actors --app-port 3000 -- dotnet run --project "./actors/actors.fsproj"
 ```
 
 ## Run the votes service
 
 ```
-cd actors
-dapr run --app-id votes dotnet run
+dapr run --app-id votes -- dotnet run --project "./votes/votes.fsproj"
 ```

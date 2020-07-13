@@ -4,9 +4,11 @@ open Dapr.Actors
 open Shared
 open System.Threading.Tasks
 
-// Based on https://github.com/dapr/dotnet-sdk/blob/master/docs/get-started-dapr-actor.md#implement-imyactor-interface
+module VotingActor =
+    [<Literal>]
+    let name = "VotingActor"
+
 type IVotingActor =
     inherit IActor
 
-    abstract Results: Task<Votes>
     abstract Vote: Animal -> Task<Votes>
