@@ -1,9 +1,11 @@
-
-# Build generated files in src
+# .NET
 /**/obj
 /**/bin
+*.sln.DotSettings.user
 
+# IDE related settings
 .fake
 .ionide
 .history
 .vscode
+/.idea

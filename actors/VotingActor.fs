@@ -22,7 +22,7 @@ type VotingActor(actorService: ActorService, actorId: ActorId) =
     let stateManager = base.StateManager
 
     /// <summary>
-    /// Helper function to handle the non-existence of the votes in the datastore in a functional way, by returning
+    /// Helper function to handle the non-existence of the votes in the data store in a functional way, by returning
     /// the `Option` type.
     ///
     /// The state manager throws an exception if the key "votes" doesn't exists in the store. We catch that exception
