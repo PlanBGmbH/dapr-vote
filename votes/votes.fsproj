@@ -6,12 +6,16 @@
     <ProjectReference Include="..\shared\shared.fsproj" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Vote.fs" />
+    <Compile Include="Actors/VotingActor.fs" />
     <Compile Include="Controllers/VoteController.fs" />
     <Compile Include="Startup.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Dapr.Actors" Version="0.8.0-preview01" />
+    <PackageReference Include="Dapr.Actors.AspNetCore" Version="0.8.0-preview01" />
     <PackageReference Include="Dapr.AspNetCore" Version="0.8.0-preview01" />
+    <PackageReference Include="FSharp.SystemTextJson" Version="0.11.13" />
   </ItemGroup>
 </Project>

@@ -1,31 +1,36 @@
 ﻿namespace Votes.Controllers
 
 open Dapr.Client
-open Dapr.Actors
 open Dapr.Actors.Client
-open System.Threading.Tasks
 open Microsoft.AspNetCore.Mvc
-open Shared
-open Shared.Actors
+open Shared.Config
 open Shared.Extensions
+open Votes
+open Votes.Actors
 
 [<ApiController>]
-[<Route("[controller]")>]
 type VoteController([<FromServices>] daprClient: DaprClient) =
     inherit ControllerBase()
 
-    [<HttpGet>]
-    member _.Results(): Task<Votes> =
+    [<HttpGet("votes")>]
+    member _.Results() =
         async {
-            let! maybeVotes = daprClient.GetStateAsyncF("voting", "votes")
+            let! maybeVotes = daprClient.GetStateAsyncF<Votes>(StateStore.name, StateStore.votes)
 
-            return match maybeVotes with
-                   | Some (votes) -> votes
-                   | None -> Votes.empty
+            let votes =
+                match maybeVotes with
+                | Some (votes) -> votes
+                | None -> Votes.empty
+
+            return OkObjectResult(votes)
         }
-        |> Async.StartAsTask
 
-    [<HttpPost>]
-    member _.Vote(animal: Animal): Task<Votes> =
-        let proxy = ActorProxy.Create<IVotingActor>(ActorId("voting"), VotingActor.name)
-        proxy.Vote(animal)
+    [<HttpPost("votes")>]
+    member _.Vote([<FromBody>] vote: Vote) =
+        async {
+            let proxy = ActorProxy.Create<IVotingActor>(VotingActor.id, VotingActor.name)
+
+            let! votes = proxy.Vote(vote.Animal) |> Async.AwaitTask
+
+            return OkObjectResult(votes)
+        }

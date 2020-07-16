@@ -10,7 +10,6 @@ The application consists of four services:
 
 | Service           | Description                     | Language   |
 | ----------------- | ------------------------------- | ---------- |
-| `actors`          | Serves the actors               | F#         |
 | `votes`           | Handles the voting              | F#         |
 | `notifications`   | Allows to subscribe for updates | C#         |
 | `frontend`        | The react frontend application  | TypeScript |
@@ -22,14 +21,8 @@ The application consists of four services:
 [Publish and Subscribe]: https://github.com/dapr/docs/blob/master/concepts/publish-subscribe-messaging/README.md
 
 
-## Run the actors service
-
-```
-dapr run --app-id actors --app-port 3000 -- dotnet run --project "./actors/actors.fsproj"
-```
-
 ## Run the votes service
 
 ```
-dapr run --app-id votes -- dotnet run --project "./votes/votes.fsproj"
+dapr run --app-id votes --app-port 3000 -- dotnet run --project "./votes/votes.fsproj"
 ```

@@ -1,7 +1,5 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "actors", "actors\actors.fsproj", "{41C43F9E-8485-4BB8-B108-597B7638E3F4}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "notifications", "notifications\notifications.csproj", "{E66BBB7C-C278-4135-96B4-1F70686B66EF}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "shared", "shared\shared.fsproj", "{267A5819-DD98-47B8-B470-7A027778A03B}"
@@ -14,10 +12,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{41C43F9E-8485-4BB8-B108-597B7638E3F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{41C43F9E-8485-4BB8-B108-597B7638E3F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{41C43F9E-8485-4BB8-B108-597B7638E3F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{41C43F9E-8485-4BB8-B108-597B7638E3F4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E66BBB7C-C278-4135-96B4-1F70686B66EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E66BBB7C-C278-4135-96B4-1F70686B66EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E66BBB7C-C278-4135-96B4-1F70686B66EF}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -1,11 +1,22 @@
-namespace Actors
+namespace Votes.Actors
 
 open Dapr.Client
 open Dapr.Actors
 open Dapr.Actors.Runtime
-open Shared
-open Shared.Actors
+open System.Threading.Tasks
 open Shared.Extensions
+open Shared.Config
+open Votes
+
+module VotingActor =
+    [<Literal>]
+    let name = "VotingActor"
+    let id = ActorId("voting")
+
+type IVotingActor =
+    inherit IActor
+
+    abstract Vote: animal: Animal -> Task<Votes>
 
 /// <summary>
 /// An actor that is responsible for handling the votes in the state store.
@@ -30,9 +41,9 @@ type VotingActor(actorService: ActorService, actorId: ActorId, daprClient: DaprC
         /// </summary>
         /// <param name="animal">The animal to vote for</param>
         /// <returns>The updated votes</returns>
-        member _.Vote(animal) =
+        member _.Vote(animal: Animal) =
             async {
-                let! maybeVotes = daprClient.GetStateAsyncF("voting", "votes")
+                let! maybeVotes = daprClient.GetStateAsyncF<Votes>(StateStore.name, StateStore.votes)
 
                 let updatedVotes =
                     (match maybeVotes with
@@ -40,7 +51,7 @@ type VotingActor(actorService: ActorService, actorId: ActorId, daprClient: DaprC
                      | None -> Votes.empty)
                         .Vote(animal)
 
-                daprClient.SaveStateAsync<Votes>("voting", "votes", updatedVotes)
+                daprClient.SaveStateAsync<Votes>(StateStore.name, StateStore.votes, updatedVotes)
                 |> Async.AwaitTask
                 |> ignore
 

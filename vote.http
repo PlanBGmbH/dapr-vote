@@ -1,6 +1,9 @@
-POST http://127.0.0.1:5000/deposit
+GET http://127.0.0.1:3000/votes
 Content-Type: application/json
 
-{ "id": "17", "amount": 12 }
-
 ###
+
+POST http://127.0.0.1:3000/votes
+Content-Type: application/json
+
+{ "animal": "Cat" }
