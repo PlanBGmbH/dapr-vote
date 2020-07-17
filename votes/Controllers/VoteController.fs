@@ -28,9 +28,15 @@ type VoteController([<FromServices>] daprClient: DaprClient) =
     [<HttpPost("votes")>]
     member _.Vote([<FromBody>] vote: Vote) =
         async {
-            let proxy = ActorProxy.Create<IVotingActor>(VotingActor.id, VotingActor.name)
+            let proxy = ActorProxy.Create<IVotingActor>(VotingActor.ID, VotingActor.Name)
 
             let! votes = proxy.Vote(vote.Animal) |> Async.AwaitTask
+
+            match vote.Subscription with
+            | Some(subscription) ->
+                daprClient.InvokeMethodAsync<Subscription>("notifications", "Subscribe", subscription)
+                |> Async.AwaitTask |> ignore
+            | None -> ()
 
             return OkObjectResult(votes)
         }

@@ -5,12 +5,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
+    <ProjectReference Include="..\shared\shared.fsproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapr.AspNetCore" Version="0.8.0-preview01" />
+    <Protobuf Include="Protos\notification.proto" GrpcServices="Server" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapr.Actors" Version="0.9.0-preview01" />
+    <PackageReference Include="Dapr.Actors.AspNetCore" Version="0.9.0-preview01" />
+    <PackageReference Include="Dapr.AspNetCore" Version="0.9.0-preview01" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.27.0" />
+    <PackageReference Include="Grpc.Core" Version="2.30.0" />
   </ItemGroup>
 
 </Project>

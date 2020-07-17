@@ -7,3 +7,17 @@ POST http://127.0.0.1:3000/votes
 Content-Type: application/json
 
 { "animal": "Cat" }
+
+###
+
+POST http://127.0.0.1:3000/votes
+Content-Type: application/json
+
+{ "animal": "Dog" }
+
+###
+
+POST http://127.0.0.1:3000/votes
+Content-Type: application/json
+
+{ "animal": "Cat", "subscription": { "name":  "Jon Doe", "email":  "jon@doe.com" } }

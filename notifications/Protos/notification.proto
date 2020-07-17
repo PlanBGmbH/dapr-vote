@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option csharp_namespace = "Notifications";
+
+service Notification {
+  rpc Subscribe (SubscriptionRequest) returns (SubscriptionResponse);
+  rpc Unsubscribe (UnsubscriptionRequest) returns (UnsubscriptionResponse);
+}
+
+message SubscriptionRequest {
+  string name = 1;
+  string email = 2;
+}
+
+message SubscriptionResponse {
+  string message = 1;
+}
+
+message UnsubscriptionRequest {
+  string email = 1;
+}
+
+message UnsubscriptionResponse {
+  string message = 1;
+}

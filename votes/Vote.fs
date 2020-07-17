@@ -4,9 +4,13 @@ type Animal =
     | Cat
     | Dog
 
+type Subscription =
+    { Name: string
+      Email: string }
+
 type Vote =
     { Animal: Animal
-      Email: Option<string> }
+      Subscription: Option<Subscription> }
 
 type Votes =
     { Cats: int

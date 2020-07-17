@@ -9,38 +9,44 @@ open Shared.Config
 open Votes
 
 module VotingActor =
+
+    /// <summary>
+    /// The name of the actor.
+    /// </summary>
     [<Literal>]
-    let name = "VotingActor"
-    let id = ActorId("voting")
+    let Name = "VotingActor"
 
-type IVotingActor =
-    inherit IActor
-
-    abstract Vote: animal: Animal -> Task<Votes>
+    /// <summary>
+    /// The ID of the actor.
+    /// </summary>
+    let ID = ActorId("voting")
 
 /// <summary>
 /// An actor that is responsible for handling the votes in the state store.
-///
-/// The voting process with Dapr's state store, isn't an atomic operation. We must first retrieve the votes from
-/// the store, increase the voting counter and store it again with the updated value. Due to the concurrent nature
-/// of our program, we have a high change that a race condition occurs and that we lost voting requests. Therefore
-/// we use an actor to handle the state manipulation. Due to it's nature an actor handles on request at the time.
-/// With this we don't need to implement locking or synchronization in our program.
+/// </summary>
+type IVotingActor =
+    inherit IActor
+
+    /// <summary>
+    /// Increase the votes for the given `Animal`.
+    /// </summary>
+    /// <param name="animal">The animal to vote for.</param>
+    /// <returns>The updated votes.</returns>
+    abstract Vote: animal: Animal -> Task<Votes>
+
+/// <summary>
+/// Initializes a new instance of the <see cref="VotingActor"/> class.
 /// </summary>
 /// <param name="actorService">The <see cref="P:Dapr.Actors.Runtime.Actor.ActorService" /> that will host this actor instance.</param>
-/// <param name="actorId">Id for the actor.</param>
+/// <param name="actorId">ID for the actor.</param>
 /// <param name="daprClient">A dapr client instance.</param>
-[<Actor(TypeName = VotingActor.name)>]
+[<Actor(TypeName = VotingActor.Name)>]
 type VotingActor(actorService: ActorService, actorId: ActorId, daprClient: DaprClient) =
     inherit Actor(actorService, actorId)
 
     interface IVotingActor with
 
-        /// <summary>
-        /// Increase the votes for the given `Animal`.
-        /// </summary>
-        /// <param name="animal">The animal to vote for</param>
-        /// <returns>The updated votes</returns>
+        /// <inheritdoc/>
         member _.Vote(animal: Animal) =
             async {
                 let! maybeVotes = daprClient.GetStateAsyncF<Votes>(StateStore.name, StateStore.votes)
