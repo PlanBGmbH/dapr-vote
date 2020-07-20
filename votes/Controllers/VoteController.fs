@@ -3,6 +3,7 @@
 open Dapr.Client
 open Dapr.Actors.Client
 open Microsoft.AspNetCore.Mvc
+open Notifications
 open Shared.Config
 open Shared.Extensions
 open Votes
@@ -34,7 +35,8 @@ type VoteController([<FromServices>] daprClient: DaprClient) =
 
             match vote.Subscription with
             | Some(subscription) ->
-                daprClient.InvokeMethodAsync<Subscription>("notifications", "Subscribe", subscription)
+                let grpcSubscription = Grpc.Subscription(Name = subscription.Name, Email = subscription.Email)
+                daprClient.InvokeMethodAsync<Grpc.Subscription>("notifications", "Subscribe", grpcSubscription)
                 |> Async.AwaitTask |> ignore
             | None -> ()
 

@@ -4,9 +4,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Notifications.Services;
+using Shared;
 
 namespace Notifications
 {
+    extern alias Shaded;
+
     /// <summary>
     /// Contains the startup methods for the application.
     /// </summary>
@@ -25,6 +28,8 @@ namespace Notifications
                 options.EnableDetailedErrors = true;
             });
             services.AddRouting();
+            services.AddSingleton(typeof(NotificationService), typeof(NotificationService));
+            services.AddSingleton(Config.Dapr.client);
         }
 
         /// <summary>
@@ -47,7 +52,7 @@ namespace Notifications
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcService<NotificationService>();
+                endpoints.MapGrpcService<DaprService>();
 
                 endpoints.MapGet("/", async context =>
                 {

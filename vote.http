@@ -1,23 +1,23 @@
-GET http://127.0.0.1:3000/votes
+GET http://localhost:3000/votes
 Content-Type: application/json
 
 ###
 
-POST http://127.0.0.1:3000/votes
+POST http://localhost:3000/votes
 Content-Type: application/json
 
 { "animal": "Cat" }
 
 ###
 
-POST http://127.0.0.1:3000/votes
+POST http://localhost:3000/votes
 Content-Type: application/json
 
 { "animal": "Dog" }
 
 ###
 
-POST http://127.0.0.1:3000/votes
+POST http://localhost:3000/votes
 Content-Type: application/json
 
 { "animal": "Cat", "subscription": { "name":  "Jon Doe", "email":  "jon@doe.com" } }

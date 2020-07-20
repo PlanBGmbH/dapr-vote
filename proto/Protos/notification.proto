@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option csharp_namespace = "Notifications.Grpc";
+
+import "base.proto";
+
+service Notification {
+  rpc Subscribe (Subscription) returns (Response);
+  rpc Unsubscribe (Unsubscription) returns (Response);
+}
+
+message Subscription {
+  string name = 1;
+  string email = 2;
+}
+
+message Unsubscription {
+  string email = 1;
+}

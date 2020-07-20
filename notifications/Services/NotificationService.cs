@@ -1,9 +1,10 @@
-using System;
+extern alias Shaded;
 using System.Threading.Tasks;
 using Dapr.Actors.Client;
-using Dapr.Client;
+using Shaded.Dapr.Client;
 using Grpc.Core;
 using Notifications.Actors;
+using Notifications.Grpc;
 
 namespace Notifications.Services
 {
@@ -29,15 +30,16 @@ namespace Notifications.Services
         /// <param name="request"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        async public override Task<SubscriptionResponse> Subscribe(SubscriptionRequest request, ServerCallContext context)
+        async public override Task<Response> Subscribe(Grpc.Subscription request, ServerCallContext context)
         {
             var subscription = new Subscription(request.Email, request.Name);
 
             var proxy = ActorProxy.Create<ISubscriptionActor>(SubscriptionActor.ID, SubscriptionActor.Name);
             await proxy.Subscribe(subscription);
 
-            return new SubscriptionResponse
+            return new Response
             {
+                Status = Response.Types.Status.Successful,
                 Message = $"Successfully created subscription for user {request.Name} with email {request.Email}"
             };
         }
@@ -48,13 +50,14 @@ namespace Notifications.Services
         /// <param name="request">The unsubscription request.</param>
         /// <param name="context">The gRPC server context.</param>
         /// <returns>The unsubscription response.</returns>
-        async public override Task<UnsubscriptionResponse> Unsubscribe(UnsubscriptionRequest request, ServerCallContext context)
+        async public override Task<Response> Unsubscribe(Unsubscription request, ServerCallContext context)
         {
             var proxy = ActorProxy.Create<ISubscriptionActor>(SubscriptionActor.ID, SubscriptionActor.Name);
             await proxy.Unsubscribe(request.Email);
 
-            return new UnsubscriptionResponse
+            return new Response
             {
+                Status = Response.Types.Status.Successful,
                 Message = $"Successfully removed subscription for email: {request.Email}"
             };
         }

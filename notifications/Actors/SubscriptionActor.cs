@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿extern alias Shaded;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dapr.Actors;
 using Dapr.Actors.Runtime;
-using Dapr.Client;
+using Shaded.Dapr.Client;
 using Shared;
 
 namespace Notifications.Actors

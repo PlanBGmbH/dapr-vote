@@ -1,0 +1,12 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Notifications.Grpc";
+
+message Response {
+  enum Status {
+    SUCCESSFUL = 0;
+    FAILURE = 1;
+  }
+  Status status = 1;
+  string message = 2;
+}

@@ -3,7 +3,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\shared\shared.fsproj" />
+    <ProjectReference Include="../shared/shared.fsproj" />
+    <ProjectReference Include="../proto/proto.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Vote.fs" />
