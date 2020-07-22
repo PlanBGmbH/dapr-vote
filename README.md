@@ -11,6 +11,7 @@ The application consists of three services:
 | Service           | Description                     | Language   |
 | ----------------- | ------------------------------- | ---------- |
 | `votes`           | Handles the voting              | F#         |
+| `subscriptions`   | Handles the subscriptions       | F#         |
 | `notifications`   | Allows to subscribe for updates | C#         |
 | `frontend`        | The react frontend application  | TypeScript |
 
@@ -71,6 +72,12 @@ dotnet-grpc add-url -o "Protos/dapr/proto/common/v1/common.proto" -i Protos/ -s 
 
 ```
 dapr run --app-id votes --app-port 3000 -- dotnet run --project "./votes/votes.fsproj"
+```
+
+## Run the subscriptions service
+
+```
+dapr run --app-id subscriptions --app-port 3001 -- dotnet run --project "./subscriptions/subscriptions.fsproj"
 ```
 
 ## Run the notifications service

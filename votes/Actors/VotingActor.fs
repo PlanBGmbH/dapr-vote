@@ -3,10 +3,11 @@ namespace Votes.Actors
 open Dapr.Client
 open Dapr.Actors
 open Dapr.Actors.Runtime
-open System.Threading.Tasks
-open Shared.Extensions
+open FSharpx.Control
 open Shared.Config
-open Votes
+open Shared.Extensions
+open System.Threading.Tasks
+open Shared
 
 module VotingActor =
 
@@ -49,18 +50,12 @@ type VotingActor(actorService: ActorService, actorId: ActorId, daprClient: DaprC
         /// <inheritdoc/>
         member _.Vote(animal: Animal) =
             async {
-                let! maybeVotes = daprClient.GetStateAsyncF<Votes>(StateStore.name, StateStore.votes)
+                let! votes = daprClient.GetStateAsyncOr(StateStore.name, StateStore.votes, Votes.empty)
 
-                let updatedVotes =
-                    (match maybeVotes with
-                     | Some (votes) -> votes
-                     | None -> Votes.empty)
-                        .Vote(animal)
+                let updatedVotes = votes.Vote(animal)
 
-                daprClient.SaveStateAsync<Votes>(StateStore.name, StateStore.votes, updatedVotes)
+                return! daprClient.SaveStateAsync<Votes>(StateStore.name, StateStore.votes, updatedVotes)
                 |> Async.AwaitTask
-                |> ignore
-
-                return updatedVotes
+                |> Async.map(fun _ -> updatedVotes)
             }
             |> Async.StartAsTask

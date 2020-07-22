@@ -21,3 +21,22 @@ POST http://localhost:3000/votes
 Content-Type: application/json
 
 { "animal": "Cat", "subscription": { "name":  "Jon Doe", "email":  "jon@doe.com" } }
+
+###
+
+GET http://localhost:3001/subscriptions
+Content-Type: application/json
+
+###
+
+POST http://localhost:3001/subscriptions
+Content-Type: application/json
+
+{ "name":  "Jon Doe", "email":  "jon@doe.com" }
+
+###
+
+DELETE http://localhost:3001/subscriptions/jon@doe.com
+Content-Type: application/json
+
+###

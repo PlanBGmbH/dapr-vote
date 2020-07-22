@@ -4,8 +4,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Extensions/DaprClient.fs" />
     <Compile Include="Config.fs" />
+    <Compile Include="Extensions.fs" />
+    <Compile Include="Models.fs" />
   </ItemGroup>
 
   <ItemGroup>

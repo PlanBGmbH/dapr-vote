@@ -1,4 +1,4 @@
-namespace Votes
+namespace Shared
 
 type Animal =
     | Cat

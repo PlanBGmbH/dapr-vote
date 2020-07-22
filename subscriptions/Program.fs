@@ -1,15 +1,15 @@
-namespace Votes
+namespace Subscriptions
 
 open Dapr.Actors.AspNetCore
 open Dapr.Actors.Runtime
 open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Hosting
 open Shared.Config
-open Votes.Actors
+open Subscriptions.Actors
 
 module Program =
     let exitCode = 0
-    let port = 3000
+    let port = 3001
 
     let CreateHostBuilder args =
         Host.CreateDefaultBuilder(args)
@@ -17,9 +17,9 @@ module Program =
                 webBuilder
                     .UseStartup<Startup>()
                     .UseActors(fun actorRuntime ->
-                        actorRuntime.RegisterActor<VotingActor>(fun tpe ->
+                        actorRuntime.RegisterActor<SubscriptionActor>(fun tpe ->
                             ActorService(tpe, fun actorService actorId ->
-                                VotingActor(
+                                SubscriptionActor(
                                     actorService,
                                     actorId,
                                     Dapr.client
