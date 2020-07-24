@@ -15,10 +15,10 @@ type VoteController([<FromServices>] daprClient: DaprClient) =
     [<HttpGet("subscriptions")>]
     member _.Subscriptions() =
         async {
-            let! votes =
+            let! subscriptions =
                 daprClient.GetStateAsyncOr<Subscriptions>(StateStore.name, StateStore.subscriptions, Subscriptions())
 
-            return OkObjectResult(votes)
+            return OkObjectResult(subscriptions.Values)
         }
 
     [<HttpPost("subscriptions")>]

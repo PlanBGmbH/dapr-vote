@@ -1,9 +1,5 @@
-using Dapr.Actors.AspNetCore;
-using Dapr.Actors.Runtime;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using Notifications.Actors;
-using Shared;
 
 namespace Notifications
 {
@@ -12,7 +8,7 @@ namespace Notifications
     /// </summary>
     public static class Program
     {
-        private const int Port = 3001;
+        private const int Port = 3002;
 
         /// <summary>
         /// Main entry point for the program.
@@ -32,13 +28,6 @@ namespace Notifications
                 {
                     webBuilder
                         .UseStartup<Startup>()
-                        .UseActors(actorRuntime =>
-                            {
-                                actorRuntime.RegisterActor<SubscriptionActor>(type =>
-                                    new ActorService(type, (actorService, actorId) =>
-                                        new SubscriptionActor(actorService, actorId, Config.Dapr.client)));
-                            }
-                        )
                         .UseUrls($"http://localhost:{Port}/");
                 });
     }

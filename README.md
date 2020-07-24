@@ -85,5 +85,18 @@ dapr run --app-id subscriptions --app-port 3001 -- dotnet run --project "./subsc
 The notification service uses a gRPC instead of a REST API. This must be activated by the `--protocol grpc` argument.
 
 ```
-dapr run --app-id notifications --app-port 3001 --protocol grpc -- dotnet run --project "./notifications/notifications.csproj"
+dapr run --app-id notifications --app-port 3002 --protocol grpc -- dotnet run --project "./notifications/notifications.csproj"
 ```
+
+## Run a local mail server
+
+The notification service sends emails to subscribed users. To run a local email server for development, the [maildev] package can be used.
+
+```
+npm install -g maildev
+maildev --smtp 1025 --web 8080
+```
+
+This starts a local mail server on port 1025. The incoming mails can be viewed on http://localhost:8080
+
+[maildev]: https://github.com/maildev/maildev

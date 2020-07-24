@@ -6,6 +6,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Notifications.Grpc;
 using Proto;
+using Proto.Notifications;
 
 namespace Notifications.Services
 {
@@ -30,10 +31,8 @@ namespace Notifications.Services
         {
             return request.Method switch
             {
-                "Subscribe" =>
-                    ProxyGrpc<Grpc.Subscription, Response>(request, context, _notificationService.Subscribe),
-                "Unsubscribe" =>
-                    ProxyGrpc<Unsubscription, Response>(request, context, _notificationService.Unsubscribe),
+                "Notify" =>
+                    ProxyGrpc<NotificationRequest, Response>(request, context, _notificationService.Notify),
                 _ => Task.FromResult(new InvokeResponse
                 {
                     Data = AnyConverter.ToAny(new Response

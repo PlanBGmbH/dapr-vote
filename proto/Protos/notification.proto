@@ -1,12 +1,16 @@
 syntax = "proto3";
 
-option csharp_namespace = "Notifications.Grpc";
+option csharp_namespace = "Proto.Notifications";
 
 import "base.proto";
 
 service Notification {
-  rpc Subscribe (Subscription) returns (Response);
-  rpc Unsubscribe (Unsubscription) returns (Response);
+  rpc Notify (NotificationRequest) returns (Response);
+}
+
+message NotificationRequest {
+  repeated Subscription subscriptions = 1;
+  Votes votes = 2;
 }
 
 message Subscription {
@@ -14,6 +18,7 @@ message Subscription {
   string email = 2;
 }
 
-message Unsubscription {
-  string email = 1;
+message Votes {
+  int32 cats = 1;
+  int32 dogs = 2;
 }

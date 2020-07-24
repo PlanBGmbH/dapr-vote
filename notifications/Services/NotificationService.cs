@@ -1,10 +1,13 @@
 extern alias Shaded;
 using System.Threading.Tasks;
-using Dapr.Actors.Client;
-using Shaded.Dapr.Client;
 using Grpc.Core;
-using Notifications.Actors;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using Microsoft.Extensions.Configuration;
+using MimeKit;
 using Notifications.Grpc;
+using Proto.Notifications;
+using Shaded::Dapr.Client;
 
 namespace Notifications.Services
 {
@@ -14,14 +17,17 @@ namespace Notifications.Services
     public class NotificationService : Notification.NotificationBase
     {
         private readonly DaprClient _daprClient;
+        private readonly IConfiguration _config;
 
         /// <summary>
         /// The class constructor.
         /// </summary>
         /// <param name="daprClient">An instance of the dapr client.</param>
-        public NotificationService(DaprClient daprClient)
+        /// <param name="config">The application configuration.</param>
+        public NotificationService(DaprClient daprClient, IConfiguration config)
         {
             _daprClient = daprClient;
+            _config = config;
         }
 
         /// <summary>
@@ -30,35 +36,33 @@ namespace Notifications.Services
         /// <param name="request"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        async public override Task<Response> Subscribe(Grpc.Subscription request, ServerCallContext context)
+        async public override Task<Response> Notify(NotificationRequest request, ServerCallContext context)
         {
-            var subscription = new Subscription(request.Email, request.Name);
+            using (var smtpClient = new SmtpClient())
+            {
+                await smtpClient.ConnectAsync(_config["Smtp:Host"], int.Parse(_config["Smtp:Port"]), SecureSocketOptions.None);
 
-            var proxy = ActorProxy.Create<ISubscriptionActor>(SubscriptionActor.ID, SubscriptionActor.Name);
-            await proxy.Subscribe(subscription);
+                foreach (var subscription in request.Subscriptions)
+                {
+                    var mailMessage = new MimeMessage();
+                    mailMessage.From.Add(new MailboxAddress("Voting service", "noreply@voting.com"));
+                    mailMessage.To.Add(new MailboxAddress(subscription.Name, subscription.Email));
+                    mailMessage.Subject = "New voting results";
+                    mailMessage.Body = new TextPart("plain")
+                    {
+                        Text = $"Hello {subscription.Name}\n\n" +
+                               ""
+                    };
+
+                    await smtpClient.SendAsync(mailMessage);
+                }
+                await smtpClient.DisconnectAsync(true);
+            }
 
             return new Response
             {
                 Status = Response.Types.Status.Successful,
-                Message = $"Successfully created subscription for user {request.Name} with email {request.Email}"
-            };
-        }
-
-        /// <summary>
-        /// Unsubscribe from voting notifications.
-        /// </summary>
-        /// <param name="request">The unsubscription request.</param>
-        /// <param name="context">The gRPC server context.</param>
-        /// <returns>The unsubscription response.</returns>
-        async public override Task<Response> Unsubscribe(Unsubscription request, ServerCallContext context)
-        {
-            var proxy = ActorProxy.Create<ISubscriptionActor>(SubscriptionActor.ID, SubscriptionActor.Name);
-            await proxy.Unsubscribe(request.Email);
-
-            return new Response
-            {
-                Status = Response.Types.Status.Successful,
-                Message = $"Successfully removed subscription for email: {request.Email}"
+                Message = $"Successfully send notifications to {request.Subscriptions.Count} users"
             };
         }
     }
