@@ -4,13 +4,10 @@ open Dapr.Client
 open Dapr.Actors
 open Dapr.Actors.Runtime
 open FSharpx.Control
-open System.Collections.Generic
 open System.Threading.Tasks
 open Shared.Config
 open Shared.Extensions
 open Shared
-
-type Subscriptions = Dictionary<string, Subscription>
 
 module SubscriptionActor =
 
@@ -61,20 +58,20 @@ type SubscriptionActor(actorService: ActorService, actorId: ActorId, daprClient:
         member _.Subscribe(subscription: Subscription) =
             async {
                 let! subscriptions =
-                    daprClient.GetStateAsyncOr(StateStore.name, StateStore.subscriptions, Subscriptions())
+                    daprClient.GetStateAsyncOr(StateStore.name, Apps.subscriptions, Map.empty<string, Subscription>)
 
-                let maybeValue = subscriptions.GetValueO(subscription.Email)
+                let maybeValue = subscriptions.TryFind(subscription.Email)
 
                 return!
                     match maybeValue with
                     | Some(value) when value.Name = subscription.Name ->
                         async { return subscriptions }
                     | _ ->
-                        subscriptions.[subscription.Email] <- subscription
+                        let updatedSubscriptions = subscriptions.Add(subscription.Email, subscription)
 
-                        daprClient.SaveStateAsync(StateStore.name, StateStore.subscriptions, subscriptions)
+                        daprClient.SaveStateAsync(StateStore.name, Apps.subscriptions, updatedSubscriptions)
                         |> Async.AwaitTask
-                        |> Async.map (fun _ -> subscriptions)
+                        |> Async.map (fun _ -> updatedSubscriptions)
             }
             |> Async.StartAsTask
 
@@ -82,12 +79,12 @@ type SubscriptionActor(actorService: ActorService, actorId: ActorId, daprClient:
         member _.Unsubscribe(email: string) =
             async {
                 let! subscriptions =
-                    daprClient.GetStateAsyncOr(StateStore.name, StateStore.subscriptions, Subscriptions())
+                    daprClient.GetStateAsyncOr(StateStore.name, Apps.subscriptions, Map.empty<string, Subscription>)
 
                 return!
-                    match subscriptions.Remove(email) with
+                    match subscriptions.ContainsKey(email) with
                     | true ->
-                        daprClient.SaveStateAsync(StateStore.name, StateStore.subscriptions, subscriptions)
+                        daprClient.SaveStateAsync(StateStore.name, Apps.subscriptions, subscriptions.Remove(email))
                         |> Async.AwaitTask
                         |> Async.map (fun _ -> subscriptions)
                     | false -> async { return subscriptions }

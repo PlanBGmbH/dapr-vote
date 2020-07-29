@@ -7,6 +7,7 @@ using Grpc.Core;
 using Notifications.Grpc;
 using Proto;
 using Proto.Notifications;
+using Shared;
 
 namespace Notifications.Services
 {
@@ -39,7 +40,7 @@ namespace Notifications.Services
                     {
                         Status = Response.Types.Status.Failure,
                         Message = $"Unexpected service method: {request.Method}"
-                    })
+                    }, Config.jsonSerializerOptions)
                 })
             };
         }
@@ -70,9 +71,9 @@ namespace Notifications.Services
             ServerCallContext context,
             Func<TR, ServerCallContext, Task<TP>> func
         ) {
-            TP response = await func(AnyConverter.FromAny<TR>(request.Data), context);
+            TP response = await func(AnyConverter.FromAny<TR>(request.Data, Config.jsonSerializerOptions), context);
 
-            return new InvokeResponse {Data = AnyConverter.ToAny(response)};
+            return new InvokeResponse {Data = AnyConverter.ToAny(response, Config.jsonSerializerOptions)};
         }
     }
 }

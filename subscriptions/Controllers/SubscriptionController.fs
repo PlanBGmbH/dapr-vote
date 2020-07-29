@@ -2,6 +2,7 @@
 
 open Dapr.Client
 open Dapr.Actors.Client
+open FSharpx.Collections
 open Microsoft.AspNetCore.Mvc
 open Shared.Config
 open Shared.Extensions
@@ -16,9 +17,9 @@ type VoteController([<FromServices>] daprClient: DaprClient) =
     member _.Subscriptions() =
         async {
             let! subscriptions =
-                daprClient.GetStateAsyncOr<Subscriptions>(StateStore.name, StateStore.subscriptions, Subscriptions())
+                daprClient.GetStateAsyncOr<Subscriptions>(StateStore.name, Apps.subscriptions, Map.empty)
 
-            return OkObjectResult(subscriptions.Values)
+            return OkObjectResult(subscriptions |> Map.values)
         }
 
     [<HttpPost("subscriptions")>]

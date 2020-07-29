@@ -51,7 +51,9 @@ namespace Notifications.Services
                     mailMessage.Body = new TextPart("plain")
                     {
                         Text = $"Hello {subscription.Name}\n\n" +
-                               ""
+                               "There are new voting results!\n" +
+                               $"Cats: {request.Votes.Cats}\n" +
+                               $"Dogs: {request.Votes.Dogs}"
                     };
 
                     await smtpClient.SendAsync(mailMessage);

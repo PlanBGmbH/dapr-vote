@@ -4,9 +4,6 @@
     <NoWarn>$(NoWarn);CS0436</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../shared/shared.fsproj" />
-  </ItemGroup>
-  <ItemGroup>
     <Protobuf Include="Protos/dapr/proto/common/v1/common.proto" GrpcServices="Server" AdditionalImportDirs="Protos/">
       <SourceUrl>https://raw.githubusercontent.com/dapr/dapr/v0.9.0/dapr/proto/common/v1/common.proto</SourceUrl>
     </Protobuf>

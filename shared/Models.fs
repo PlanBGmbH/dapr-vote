@@ -8,6 +8,8 @@ type Subscription =
     { Name: string
       Email: string }
 
+type Subscriptions = Map<string, Subscription>
+
 type Vote =
     { Animal: Animal
       Subscription: Option<Subscription> }

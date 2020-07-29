@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
-using Shared;
 
 namespace Proto
 {
@@ -19,15 +18,16 @@ namespace Proto
         /// Converts the given data to <see cref="Any" />.
         /// </summary>
         /// <param name="data">The data to convert.</param>
+        /// <param name="jsonSerializerOptions">The JSON serializer options.</param>
         /// <typeparam name="T">The type of the data.</typeparam>
         /// <returns>The <see cref="Any" /> representation of the data.</returns>
-        public static Any ToAny<T>(T data)
+        public static Any ToAny<T>(T data, JsonSerializerOptions jsonSerializerOptions)
         {
             var any = new Any();
             if (data == null)
                 return any;
 
-            var bytes = JsonSerializer.SerializeToUtf8Bytes(data, Config.jsonSerializerOptions);
+            var bytes = JsonSerializer.SerializeToUtf8Bytes(data, jsonSerializerOptions);
             any.Value = ByteString.CopyFrom(bytes);
 
             return any;
@@ -37,12 +37,13 @@ namespace Proto
         /// Converts the given <see cref="Any" /> type to the type `T`.
         /// </summary>
         /// <param name="any">The <see cref="Any" /> type to convert.</param>
+        /// <param name="jsonSerializerOptions">The JSON serializer options.</param>
         /// <typeparam name="T">The type to convert to.</typeparam>
         /// <returns>The data as `T`.</returns>
-        public static T FromAny<T>(Any any)
+        public static T FromAny<T>(Any any, JsonSerializerOptions jsonSerializerOptions)
         {
             var utf8String = any.Value.ToStringUtf8();
-            return JsonSerializer.Deserialize<T>(utf8String, Config.jsonSerializerOptions);
+            return JsonSerializer.Deserialize<T>(utf8String, jsonSerializerOptions);
         }
     }
 }

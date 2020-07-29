@@ -8,7 +8,6 @@ open Shared.Config
 open Shared.Extensions
 open Shared
 open Votes.Actors
-open Proto
 
 [<ApiController>]
 type VoteController([<FromServices>] daprClient: DaprClient) =
@@ -17,7 +16,7 @@ type VoteController([<FromServices>] daprClient: DaprClient) =
     [<HttpGet("votes")>]
     member _.Results() =
         async {
-            let! votes = daprClient.GetStateAsyncOr<Votes>(StateStore.name, StateStore.votes, Votes.empty)
+            let! votes = daprClient.GetStateAsyncOr<Votes>(StateStore.name, Apps.votes, Votes.empty)
 
             return OkObjectResult(votes)
         }
@@ -36,16 +35,7 @@ type VoteController([<FromServices>] daprClient: DaprClient) =
                 httpExtension.Verb <- HTTPVerb.Post
                 httpExtension.ContentType <- "application/json"
 
-                daprClient.InvokeMethodAsync<Subscription>("subscriptions", "subscriptions", subscription, httpExtension)
-                |> Async.AwaitTask |> ignore
-
-                let grpcSubscription = Notifications.Subscription(Name = "Test", Email = "test")
-                let grpcVotes = Notifications.Votes(Cats = votes.Cats, Dogs = votes.Dogs)
-                let grpcRequest = Notifications.NotificationRequest()
-                grpcRequest.Subscriptions.Add(grpcSubscription)
-                grpcRequest.Votes <- grpcVotes
-
-                daprClient.InvokeMethodAsync<Notifications.NotificationRequest>("notifications", "Notify", grpcRequest)
+                daprClient.InvokeMethodAsync<Subscription>(Apps.notifications, "subscriptions", subscription, httpExtension)
                 |> Async.AwaitTask |> ignore
 
             return OkObjectResult(votes)
