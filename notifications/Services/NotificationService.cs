@@ -1,5 +1,6 @@
-extern alias Shaded;
+using System;
 using System.Threading.Tasks;
+using Dapr.Client;
 using Grpc.Core;
 using MailKit.Net.Smtp;
 using MailKit.Security;
@@ -7,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using MimeKit;
 using Notifications.Grpc;
 using Proto.Notifications;
-using Shaded::Dapr.Client;
 
 namespace Notifications.Services
 {
@@ -35,12 +35,14 @@ namespace Notifications.Services
         /// </summary>
         /// <param name="request"></param>
         /// <param name="context"></param>
-        /// <returns></returns>
+        /// <returns>The response which indicates if notifications were sent.</returns>
         async public override Task<Response> Notify(NotificationRequest request, ServerCallContext context)
         {
             using (var smtpClient = new SmtpClient())
             {
                 await smtpClient.ConnectAsync(_config["Smtp:Host"], int.Parse(_config["Smtp:Port"]), SecureSocketOptions.None);
+
+                Console.WriteLine(request.Subscriptions);
 
                 foreach (var subscription in request.Subscriptions)
                 {

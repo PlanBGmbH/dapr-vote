@@ -7,18 +7,11 @@
     <ProjectReference Include="../proto/proto.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Dapr.Actors" Version="0.9.0-preview01" />
-    <PackageReference Include="Dapr.Actors.AspNetCore" Version="0.9.0-preview01" />
-    <PackageReference Include="Dapr.AspNetCore" Version="0.9.0-preview01" />
+    <PackageReference Include="Dapr.Actors" Version="0.11.0-preview02" />
+    <PackageReference Include="Dapr.Actors.AspNetCore" Version="0.11.0-preview02" />
+    <PackageReference Include="Dapr.AspNetCore" Version="0.11.0-preview02" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.30.0" />
     <PackageReference Include="Grpc.Core" Version="2.30.0" />
     <PackageReference Include="MailKit" Version="2.8.0" />
   </ItemGroup>
-  <Target Name="ShadeDaprClient" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
-    <ItemGroup>
-      <ReferencePath Condition="'%(ReferencePath.NuGetPackageId)' == 'Dapr.Client'">
-        <Aliases>Shaded</Aliases>
-      </ReferencePath>
-    </ItemGroup>
-  </Target>
 </Project>

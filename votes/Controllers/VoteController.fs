@@ -35,7 +35,7 @@ type VoteController([<FromServices>] daprClient: DaprClient) =
                 httpExtension.Verb <- HTTPVerb.Post
                 httpExtension.ContentType <- "application/json"
 
-                daprClient.InvokeMethodAsync<Subscription>(Apps.notifications, "subscriptions", subscription, httpExtension)
+                daprClient.InvokeMethodAsync<Subscription>(Apps.subscriptions, "subscriptions", subscription, httpExtension)
                 |> Async.AwaitTask |> ignore
 
             return OkObjectResult(votes)

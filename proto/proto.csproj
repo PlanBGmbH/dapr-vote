@@ -4,17 +4,11 @@
     <NoWarn>$(NoWarn);CS0436</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Protobuf Include="Protos/dapr/proto/common/v1/common.proto" GrpcServices="Server" AdditionalImportDirs="Protos/">
-      <SourceUrl>https://raw.githubusercontent.com/dapr/dapr/v0.9.0/dapr/proto/common/v1/common.proto</SourceUrl>
-    </Protobuf>
-    <Protobuf Include="Protos/dapr/proto/runtime/v1/appcallback.proto" GrpcServices="Server" AdditionalImportDirs="Protos/">
-      <SourceUrl>https://raw.githubusercontent.com/dapr/dapr/v0.9.0/dapr/proto/runtime/v1/appcallback.proto</SourceUrl>
-    </Protobuf>
     <Protobuf Include="Protos/base.proto" GrpcServices="Server,Client" AdditionalImportDirs="Protos/" />
     <Protobuf Include="Protos/notification.proto" GrpcServices="Server,Client" AdditionalImportDirs="Protos/" />
   </ItemGroup>
   <ItemGroup>
-      <PackageReference Include="Grpc.AspNetCore" Version="2.30.0" />
-      <PackageReference Include="Grpc.Core" Version="2.30.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.30.0" />
+    <PackageReference Include="Grpc.Core" Version="2.30.0" />
   </ItemGroup>
 </Project>

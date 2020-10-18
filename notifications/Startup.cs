@@ -8,8 +8,6 @@ using Shared;
 
 namespace Notifications
 {
-    extern alias Shaded;
-
     /// <summary>
     /// Contains the startup methods for the application.
     /// </summary>

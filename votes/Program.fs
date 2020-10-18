@@ -1,6 +1,5 @@
 namespace Votes
 
-open System
 open Dapr.Actors.AspNetCore
 open Dapr.Actors.Runtime
 open Microsoft.AspNetCore.Hosting

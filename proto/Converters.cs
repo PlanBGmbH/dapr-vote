@@ -5,45 +5,77 @@ using Google.Protobuf.WellKnownTypes;
 namespace Proto
 {
     /// <summary>
-    /// Workaround for the protobuf <see cref="Any.Pack(Google.Protobuf.IMessage)" /> and <see cref="Any.Unpack{T}" /> methods.
-    ///
-    /// Actually dapr uses JSON to serialize/deserialize <see cref="Any" /> types internally. This isn't standard and so
-    /// <see cref="Any.Pack(Google.Protobuf.IMessage)" /> and <see cref="Any.Unpack{T}" /> won't work.
-    ///
-    /// See: <see href="https://github.com/dapr/dotnet-sdk/issues/268" />
+    /// Actually dapper doesn't expose the internal serializer/deserializer functionality. So we must copy this part
+    /// to make gRPC enabled APIs with AppCallback.AppCallbackBase possible.
     /// </summary>
     public class AnyConverter
     {
         /// <summary>
-        /// Converts the given data to <see cref="Any" />.
+        /// Converts an arbitrary type to a <see cref="System.Text.Json"/> based <see cref="ByteString"/>.
         /// </summary>
         /// <param name="data">The data to convert.</param>
-        /// <param name="jsonSerializerOptions">The JSON serializer options.</param>
-        /// <typeparam name="T">The type of the data.</typeparam>
-        /// <returns>The <see cref="Any" /> representation of the data.</returns>
-        public static Any ToAny<T>(T data, JsonSerializerOptions jsonSerializerOptions)
+        /// <param name="options">The JSON serialization options.</param>
+        /// <typeparam name="T">The type of the given data.</typeparam>
+        /// <returns>The given data as JSON based byte string.</returns>
+        public static ByteString ToJsonByteString<T>(T data, JsonSerializerOptions options = null)
         {
-            var any = new Any();
             if (data == null)
-                return any;
+            {
+                return ByteString.Empty;
+            }
 
-            var bytes = JsonSerializer.SerializeToUtf8Bytes(data, jsonSerializerOptions);
-            any.Value = ByteString.CopyFrom(bytes);
-
-            return any;
+            var bytes = JsonSerializer.SerializeToUtf8Bytes(data, options);
+            return ByteString.CopyFrom(bytes);
         }
 
         /// <summary>
-        /// Converts the given <see cref="Any" /> type to the type `T`.
+        /// Converts an arbitrary type to the <see cref="Any"/> Protocol Buffer type.
+        ///
+        /// If the given type is a subtype of <see cref="IMessage"/>, then it's save to use the Protocol Buffer
+        /// packaging provided for the <see cref="Any"/> type with the <see cref="Any.Pack(Google.Protobuf.IMessage)"/>.
+        /// For all other types, we use JSON serialization based on <see cref="System.Text.Json"/>.
         /// </summary>
-        /// <param name="any">The <see cref="Any" /> type to convert.</param>
-        /// <param name="jsonSerializerOptions">The JSON serializer options.</param>
-        /// <typeparam name="T">The type to convert to.</typeparam>
-        /// <returns>The data as `T`.</returns>
-        public static T FromAny<T>(Any any, JsonSerializerOptions jsonSerializerOptions)
+        /// <param name="data">The data to convert.</param>
+        /// <param name="options">The JSON serialization options.</param>
+        /// <typeparam name="T">The type of the given data.</typeparam>
+        /// <returns>The <see cref="Any"/> type representation of the given data.</returns>
+        public static Any ToAny<T>(T data, JsonSerializerOptions options = null)
         {
-            var utf8String = any.Value.ToStringUtf8();
-            return JsonSerializer.Deserialize<T>(utf8String, jsonSerializerOptions);
+            if (data == null)
+            {
+                return new Any();
+            }
+
+            var t = typeof(T);
+
+            return typeof(IMessage).IsAssignableFrom(t)
+                ? Any.Pack((IMessage) data)
+                : new Any {Value = ToJsonByteString(data, options), TypeUrl = t.FullName};
+        }
+
+        /// <summary>
+        /// Converts the Protocol Buffer <see cref="Any"/> type to an arbitrary type.
+        ///
+        /// If the type to convert to is a subtype of <see cref="IMessage"/> and if the type has an empty default
+        /// constructor, then we use the <see cref="Any.Unpack{T}"/> method to deserialize the given <see cref="Any"/>
+        /// instance. For all other types, we use JSON deserialization based on <see cref="System.Text.Json"/>.
+        /// </summary>
+        /// <param name="any">The any instance to convert.</param>
+        /// <param name="options">The JSON serialization options.</param>
+        /// <typeparam name="T">The type to convert to.</typeparam>
+        /// <returns>An instance of T.</returns>
+        public static T FromAny<T>(Any any, JsonSerializerOptions options = null)
+        {
+            var t = typeof(T);
+
+            if (typeof(IMessage).IsAssignableFrom(t) && t.GetConstructor(System.Type.EmptyTypes) != null)
+            {
+                var method = any.GetType().GetMethod("Unpack");
+                var generic = method.MakeGenericMethod(t);
+                return (T) generic.Invoke(any, null);
+            }
+
+            return JsonSerializer.Deserialize<T>(any.Value.ToStringUtf8(), options);
         }
     }
 }
